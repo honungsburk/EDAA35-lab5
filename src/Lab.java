@@ -6,7 +6,7 @@ import java.util.LinkedList;
  * Created by Frank Hampus Weslien on 2017-02-19.
  */
 public class Lab {
-        // antal ggr, infil, utfil, sortingsmetod
+        // antal ggr, infil, utfil, sortingsmetod (skriv mySort för din egen sorteringsmetod)
     public static void main (String[] args){
 
     if(args.length == 4) {
@@ -42,7 +42,7 @@ public class Lab {
     }
 
     private static String[] test(){
-        return new String[]{"600", "D:\\programmering\\txtfiler\\nummer.txt" ,"D:\\programmering\\txtfiler\\result2.txt", ""};
+        return new String[]{"600", "D:\\programmering\\txtfiler\\nummer.txt" ,"D:\\programmering\\txtfiler\\result2.txt", "mySort"};
     }
 
     public long timeMeasure(LinkedList<Integer> list, Sort f){
@@ -74,12 +74,56 @@ public class Lab {
             mySort(smaller);
             mySort(bigger);
 
-            //dessa är dumma vill ha en fucking append
+            //dessa är dumma, jag vill ha en fucking append
             list.addAll(smaller);
+            list.add(head);
             list.addAll(bigger);
         }
     }
 
+
+    public void myMergeSort(LinkedList<Integer> list ){
+
+        if(list.size() > 1){
+
+            LinkedList<Integer> smaller = new LinkedList<Integer>();
+            LinkedList<Integer> bigger = new LinkedList<Integer>();
+
+            int half = list.size()/2;
+
+            for(int i = 0; i < list.size(); i++){
+                if (i <= half)
+                    smaller.add(list.poll());
+                else
+                    bigger.add(list.poll());
+            }
+
+            myMergeSort(smaller);
+            myMergeSort(bigger);
+
+            //dessa är dumma, jag vill ha en fucking append
+            list.addAll(merge(smaller, bigger));
+
+        }
+    }
+
+    private LinkedList<Integer> merge(LinkedList<Integer> first, LinkedList<Integer> last){
+        LinkedList<Integer> result = new LinkedList<Integer>();
+        while(!(first.isEmpty() || last.isEmpty())){
+            if (first.peek().compareTo(last.peek()) >= 0)
+                result.add(first.poll());
+            else
+                result.add(last.poll());
+        }
+
+        if (!first.isEmpty())
+            result.addAll(first);
+        else if(!last.isEmpty())
+            result.addAll(last);
+
+        return result;
+
+    }
 
     public LinkedList<Integer> readFile(String filename){
         LinkedList<Integer> randomNumbers = new LinkedList<Integer>();
