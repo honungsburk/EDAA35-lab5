@@ -1,3 +1,5 @@
+
+
 import java.io.*;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -8,17 +10,23 @@ import java.util.LinkedList;
 public class Lab {
         // antal ggr, infil, utfil, sortingsmetod (skriv mySort för din egen sorteringsmetod)
     public static void main (String[] args){
-
+//args = test();
     if(args.length == 4) {
         LinkedList<Integer> toBeSortedCopy;
         Lab lab = new Lab();
         int n = Integer.parseInt(args[0]);
         LinkedList<Integer> toBeSorted = lab.readFile(args[1]);
-        boolean whichSort = args[3].equals("mySort");
+        boolean mySort = args[3].equals("mySort");
+        boolean myMergeSort = args[3].equals("myMergeSort"); //dålig
+        boolean myBestQuickSort = args[3].equals("myBestQuickSort");
         String nameOfSorting;
 
-        if(whichSort)
+        if(mySort)
             nameOfSorting = "mySort";
+        else if (myMergeSort)
+            nameOfSorting = "myMergeSort";
+        else if (myBestQuickSort)
+            nameOfSorting = "myBestQuickSort";
         else
             nameOfSorting = "Collection.sort";
 
@@ -27,10 +35,17 @@ public class Lab {
         for(int i = 0; i < n; i++) {
             toBeSortedCopy = (LinkedList<Integer>) toBeSorted.clone();
             long result;
-            if(whichSort) {
+            if(mySort)
                 result = lab.timeMeasure( toBeSortedCopy , x -> lab.mySort(x));
-            } else{
+            else if (myMergeSort)
+                result = lab.timeMeasure( toBeSortedCopy , x -> lab.myMergeSort(x));
+            else if (myBestQuickSort)
+                result = lab.timeMeasure( toBeSortedCopy , x -> lab.myBestQuickSort(x));
+            else
                 result = lab.timeMeasure( toBeSortedCopy , x -> Collections.sort(x));
+
+            for(int x: toBeSortedCopy) {
+                System.out.println(x);
             }
             sb.append(i+1  + ", " + result + System.getProperty("line.separator"));
         }
@@ -42,7 +57,7 @@ public class Lab {
     }
 
     private static String[] test(){
-        return new String[]{"600", "D:\\programmering\\txtfiler\\nummer.txt" ,"D:\\programmering\\txtfiler\\result2.txt", "mySort"};
+        return new String[]{"600", "D:\\programmering\\txtfiler\\nummer.txt" ,"D:\\programmering\\txtfiler\\myBestQuickSort.txt", "myBestQuickSort"};
     }
 
     public long timeMeasure(LinkedList<Integer> list, Sort f){
@@ -90,18 +105,19 @@ public class Lab {
             LinkedList<Integer> bigger = new LinkedList<Integer>();
 
             int half = list.size()/2;
+            int size = list.size();
 
-            for(int i = 0; i < list.size(); i++){
-                if (i <= half)
+            for(int i = 0; i < size; i++){
+                if (i < half)
                     smaller.add(list.poll());
                 else
                     bigger.add(list.poll());
             }
+            System.out.println(list.isEmpty());
 
             myMergeSort(smaller);
             myMergeSort(bigger);
 
-            //dessa är dumma, jag vill ha en fucking append
             list.addAll(merge(smaller, bigger));
 
         }
@@ -110,7 +126,7 @@ public class Lab {
     private LinkedList<Integer> merge(LinkedList<Integer> first, LinkedList<Integer> last){
         LinkedList<Integer> result = new LinkedList<Integer>();
         while(!(first.isEmpty() || last.isEmpty())){
-            if (first.peek().compareTo(last.peek()) >= 0)
+            if (first.peek().compareTo(last.peek()) < 0)
                 result.add(first.poll());
             else
                 result.add(last.poll());
@@ -122,8 +138,40 @@ public class Lab {
             result.addAll(last);
 
         return result;
-
     }
+
+
+
+    public void myBestQuickSort(LinkedList<Integer> list){
+        myBestQuickSort(list, list); //first list will get emptied in first call
+    }
+
+
+    private void myBestQuickSort(LinkedList<Integer> original, LinkedList<Integer> list){
+
+        if(list.size() > 1) {
+            int head = list.poll();
+
+            LinkedList<Integer> smaller = new LinkedList<Integer>();
+            LinkedList<Integer> bigger = new LinkedList<Integer>();
+
+            while (!list.isEmpty()) {
+                int x = list.poll();
+                if (x <= head)
+                    smaller.add(x);
+                else
+                    bigger.add(x);
+            }
+
+            myBestQuickSort(original, smaller);
+            original.add(head);
+            myBestQuickSort(original, bigger);
+        } else if (list.size() == 1){
+            original.add(list.getFirst());
+        }
+    }
+
+
 
     public LinkedList<Integer> readFile(String filename){
         LinkedList<Integer> randomNumbers = new LinkedList<Integer>();
